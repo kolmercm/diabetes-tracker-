@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "752220353251",
+    "project_id": "diabetes-tracker-82281",
+    "storage_bucket": "diabetes-tracker-82281.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:752220353251:android:3bbb9fa2d5d8ccf9bd4bd6",
+        "android_client_info": {
+          "package_name": "diabetes.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdx0Ybdt_j7ad0EjtKpVns2tE52qiZVv8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
