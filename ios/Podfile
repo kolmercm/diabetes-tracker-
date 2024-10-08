@@ -1,5 +1,5 @@
-# Uncomment this line to define a global platform for your project
-platform :ios, '16.0'  # Updated to iOS 16.0
+# Define the global platform for your project
+platform :ios, '13.0'  # This sets the minimum iOS version for all pods
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -50,8 +50,8 @@ post_install do |installer|
     end
 
     target.build_configurations.each do |config|
-      # Set the deployment target to iOS 12.0
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
+      # Set the deployment target to iOS 13.0 to match the platform version
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
       
       # Remove the -G flag from OTHER_LDFLAGS
       if config.build_settings['OTHER_LDFLAGS']
@@ -60,7 +60,18 @@ post_install do |installer|
         config.build_settings.delete('OTHER_LDFLAGS') if config.build_settings['OTHER_LDFLAGS'].empty?
       end
       
-      # Optionally, add any other necessary build setting modifications here
+      # Ensure pods support the minimum iOS version
+      config.build_settings['SWIFT_VERSION'] = '5.0'  # Use the latest Swift version
+      
+      # **Added:** Allow non-modular includes in framework modules
+      config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+      
+      # Add any other necessary build setting modifications here
+      # For example:
+      # config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
+      #   '$(inherited)',
+      #   'PERMISSION_CAMERA=1',
+      # ]
     end
   end
 end

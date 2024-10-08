@@ -9,7 +9,7 @@ class AuthService {
           email: email, password: password);
       return userCredential.user;
     } catch (e) {
-      print(e);
+      // print(e);
       return null;
     }
   }
@@ -20,7 +20,7 @@ class AuthService {
           .createUserWithEmailAndPassword(email: email, password: password);
       return userCredential.user;
     } catch (e) {
-      print(e);
+      // print(e);
       return null;
     }
   }
