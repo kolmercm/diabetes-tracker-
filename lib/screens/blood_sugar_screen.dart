@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/database_service.dart' as db_service;
 import '../models/blood_sugar.dart';
-import '../widgets/blood_sugar_chart.dart';
-
+import '../widgets/blood_sugar_log_list.dart'; // Add this import
 
 class BloodSugarScreen extends StatefulWidget {
   @override
@@ -18,20 +17,37 @@ class _BloodSugarScreenState extends State<BloodSugarScreen> {
     BloodSugar bloodSugar =
         BloodSugar(id: '', level: level, dateTime: DateTime.now());
     await _dbService.addBloodSugar(bloodSugar);
-    setState(() {});
+    setState(() {
+      levelController.clear(); // Clear the input field after logging
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Log Blood Sugar')),
+      appBar: AppBar(title: Text('Blood Sugar Log')),
       body: Column(
         children: [
-          TextField(
-              controller: levelController,
-              decoration: InputDecoration(labelText: 'Blood Sugar Level')),
-          ElevatedButton(onPressed: _logBloodSugar, child: Text('Log')),
-          // Add your BloodSugarChart widget here to show data
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: levelController,
+                    decoration: InputDecoration(labelText: 'Blood Sugar Level'),
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+                SizedBox(width: 16),
+                ElevatedButton(onPressed: _logBloodSugar, child: Text('Log')),
+              ],
+            ),
+          ),
+          // Add the BloodSugarLogList widget here
+          Expanded(
+            child: BloodSugarLogList(),
+          ),
         ],
       ),
     );

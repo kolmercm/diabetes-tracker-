@@ -1,26 +1,32 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
-import 'signup_screen.dart'; // Add this import
 import '../services/auth_service.dart';
 
-class LoginScreen extends StatefulWidget {
+class SignUpScreen extends StatefulWidget {
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _SignUpScreenState createState() => _SignUpScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   final AuthService _authService = AuthService();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
 
-  void _login() async {
-    final user = await _authService.signIn(emailController.text, passwordController.text);
+  void _signUp() async {
+    if (passwordController.text != confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Passwords do not match')),
+      );
+      return;
+    }
+
+    final user = await _authService.signUp(emailController.text, passwordController.text);
     if (user != null) {
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomeScreen()));
     } else {
-      // Add error handling
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login failed. Please check your credentials and try again.')),
+        SnackBar(content: Text('Failed to create account. Please try again.')),
       );
     }
   }
@@ -28,22 +34,16 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Login')),
+      appBar: AppBar(title: Text('Sign Up')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(controller: emailController, decoration: InputDecoration(labelText: 'Email')),
             TextField(controller: passwordController, obscureText: true, decoration: InputDecoration(labelText: 'Password')),
+            TextField(controller: confirmPasswordController, obscureText: true, decoration: InputDecoration(labelText: 'Confirm Password')),
             SizedBox(height: 20),
-            ElevatedButton(onPressed: _login, child: Text('Login')),
-            // Add a sign-up link
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => SignUpScreen()));
-              },
-              child: Text('Don\'t have an account? Sign up'),
-            ),
+            ElevatedButton(onPressed: _signUp, child: Text('Sign Up')),
           ],
         ),
       ),

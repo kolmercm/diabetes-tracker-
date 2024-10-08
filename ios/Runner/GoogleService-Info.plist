@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyCaiLEH7D8E0kTknKnV7XVWDIN12X_DABQ</string>
+	<key>GCM_SENDER_ID</key>
+	<string>752220353251</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.diabetesTracker</string>
+	<key>PROJECT_ID</key>
+	<string>diabetes-tracker-82281</string>
+	<key>STORAGE_BUCKET</key>
+	<string>diabetes-tracker-82281.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:752220353251:ios:5e0e3b04b3ae1c08bd4bd6</string>
+</dict>
+</plist>
