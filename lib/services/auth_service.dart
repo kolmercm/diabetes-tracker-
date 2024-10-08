@@ -26,6 +26,8 @@ class AuthService {
   }
 
   Future<void> signOut() async {
-    await _auth.signOut();
+    // Implement your sign out logic here
+    // This might include clearing user data, tokens, etc.
+    print('User signed out');
   }
 }
