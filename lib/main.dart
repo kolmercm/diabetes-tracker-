@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+// import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:provider/provider.dart'; // Added import
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
@@ -17,7 +17,8 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => MedicationProvider()), // Provided MedicationProvider
+        ChangeNotifierProvider(
+            create: (_) => MedicationProvider()), // Provided MedicationProvider
       ],
       child: MyApp(),
     ),
