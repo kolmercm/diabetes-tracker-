@@ -7,6 +7,7 @@ import 'screens/home_screen.dart';
 import 'providers/medication_provider.dart'; // Added import
 import 'firebase_options.dart';
 import 'providers/theme_provider.dart'; // Ensure this is included
+import 'providers/food_item_provider.dart'; // Add this import
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +19,8 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => MedicationProvider()),
+        ChangeNotifierProvider(
+            create: (_) => FoodItemProvider()), // Now this will work
       ],
       child: MyApp(),
     ),
