@@ -35,14 +35,8 @@ class _MedicationScreenState extends State<MedicationScreen> {
       return;
     }
 
-    final DateTime? dateTime = DateFormat('yyyy-MM-dd HH:mm').parse(dateTimeStr, true).toLocal();
-
-    if (dateTime == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Invalid date and time format')),
-      );
-      return;
-    }
+    final DateTime dateTime =
+        DateFormat('yyyy-MM-dd HH:mm').parse(dateTimeStr, true).toLocal();
 
     final Medication medication = Medication(
       type: type,
@@ -50,12 +44,14 @@ class _MedicationScreenState extends State<MedicationScreen> {
       dateTime: dateTime,
     );
 
-    Provider.of<MedicationProvider>(context, listen: false).addMedication(medication);
+    Provider.of<MedicationProvider>(context, listen: false)
+        .addMedication(medication);
 
     // Clear the text fields after saving
     _medicationTypeController.clear();
     _medicationAmountController.clear();
-    _dateTimeController.text = DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now());
+    _dateTimeController.text =
+        DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now());
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Medication saved successfully')),
@@ -180,6 +176,36 @@ class _MedicationScreenState extends State<MedicationScreen> {
                             title: Text(medication.type),
                             subtitle: Text(
                                 'Amount: ${medication.amount}\nDate/Time: ${DateFormat('yyyy-MM-dd HH:mm').format(medication.dateTime)}'),
+                            trailing: IconButton(
+                              icon: Icon(Icons.delete, color: Colors.red),
+                              onPressed: () {
+                                // Show confirmation dialog before deletion
+                                showDialog(
+                                  context: context,
+                                  builder: (ctx) => AlertDialog(
+                                    title: Text('Confirm Deletion'),
+                                    content: Text('Are you sure you want to delete this medication?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.of(ctx).pop(),
+                                        child: Text('Cancel'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Provider.of<MedicationProvider>(context, listen: false)
+                                              .removeMedication(medication);
+                                          Navigator.of(ctx).pop();
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text('Medication deleted')),
+                                          );
+                                        },
+                                        child: Text('Delete', style: TextStyle(color: Colors.red)),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         );
                       },

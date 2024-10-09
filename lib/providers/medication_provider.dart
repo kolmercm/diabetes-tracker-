@@ -15,4 +15,9 @@ class MedicationProvider with ChangeNotifier {
     _medications.clear();
     notifyListeners();
   }
+
+  void removeMedication(Medication medication) {
+    _medications.remove(medication);
+    notifyListeners();
+  }
 }

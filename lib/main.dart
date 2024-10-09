@@ -6,6 +6,7 @@ import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'providers/medication_provider.dart'; // Added import
 import 'firebase_options.dart';
+import 'providers/theme_provider.dart'; // Ensure this is included
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,8 +14,11 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => MedicationProvider(), // Provided MedicationProvider
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => MedicationProvider()), // Provided MedicationProvider
+      ],
       child: MyApp(),
     ),
   );
@@ -23,21 +27,27 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Diabetes Tracker',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      initialRoute: '/login',
-      onGenerateRoute: (settings) {
-        if (settings.name == '/login') {
-          return MaterialPageRoute(builder: (context) => LoginScreen());
-        } else {
-          final uri = Uri.parse(settings.name!);
-          final initialRoute = uri.path;
-          return MaterialPageRoute(
-            builder: (context) => HomeScreen(initialRoute: initialRoute),
-            settings: settings,
-          );
-        }
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          title: 'Diabetes Tracker',
+          theme: ThemeData.light(),
+          darkTheme: ThemeData.dark(),
+          themeMode: themeProvider.themeMode,
+          initialRoute: '/login',
+          onGenerateRoute: (settings) {
+            if (settings.name == '/login') {
+              return MaterialPageRoute(builder: (context) => LoginScreen());
+            } else {
+              final uri = Uri.parse(settings.name!);
+              final initialRoute = uri.path;
+              return MaterialPageRoute(
+                builder: (context) => HomeScreen(initialRoute: initialRoute),
+                settings: settings,
+              );
+            }
+          },
+        );
       },
     );
   }
