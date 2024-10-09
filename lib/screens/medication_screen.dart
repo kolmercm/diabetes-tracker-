@@ -26,39 +26,45 @@ class _MedicationScreenState extends State<MedicationScreen> {
         TextEditingController(text: kDebugMode ? '500mg' : null);
   }
 
-  void _saveMedication() {
-    final String type = _medicationTypeController.text.trim();
-    final String amount = _medicationAmountController.text.trim();
-    final String dateTimeStr = _dateTimeController.text.trim();
+  void _saveMedication() async {
+    try {
+      final String type = _medicationTypeController.text.trim();
+      final String amount = _medicationAmountController.text.trim();
+      final String dateTimeStr = _dateTimeController.text.trim();
 
-    if (type.isEmpty || amount.isEmpty || dateTimeStr.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please fill in all fields')),
+      if (type.isEmpty || amount.isEmpty || dateTimeStr.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Please fill in all fields')),
+        );
+        return;
+      }
+
+      final DateTime dateTime =
+          DateFormat('yyyy-MM-dd HH:mm').parse(dateTimeStr, true).toLocal();
+
+      final Medication medication = Medication(
+        type: type,
+        amount: amount,
+        dateTime: dateTime,
       );
-      return;
+
+      await Provider.of<MedicationProvider>(context, listen: false)
+          .addMedication(medication);
+
+      // Clear the text fields after saving
+      _medicationTypeController.clear();
+      _medicationAmountController.clear();
+      _dateTimeController.text =
+          DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now());
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Medication saved successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
     }
-
-    final DateTime dateTime =
-        DateFormat('yyyy-MM-dd HH:mm').parse(dateTimeStr, true).toLocal();
-
-    final Medication medication = Medication(
-      type: type,
-      amount: amount,
-      dateTime: dateTime,
-    );
-
-    Provider.of<MedicationProvider>(context, listen: false)
-        .addMedication(medication);
-
-    // Clear the text fields after saving
-    _medicationTypeController.clear();
-    _medicationAmountController.clear();
-    _dateTimeController.text =
-        DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now());
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Medication saved successfully')),
-    );
   }
 
   Future<void> _selectDateTime() async {
