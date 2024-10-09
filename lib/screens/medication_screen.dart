@@ -94,7 +94,8 @@ class _MedicationScreenState extends State<MedicationScreen> {
       appBar: AppBar(title: Text('Medication')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView( // Prevents overflow
+        child: SingleChildScrollView(
+          // Prevents overflow
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -184,22 +185,31 @@ class _MedicationScreenState extends State<MedicationScreen> {
                                   context: context,
                                   builder: (ctx) => AlertDialog(
                                     title: Text('Confirm Deletion'),
-                                    content: Text('Are you sure you want to delete this medication?'),
+                                    content: Text(
+                                        'Are you sure you want to delete this medication?'),
                                     actions: [
                                       TextButton(
-                                        onPressed: () => Navigator.of(ctx).pop(),
+                                        onPressed: () =>
+                                            Navigator.of(ctx).pop(),
                                         child: Text('Cancel'),
                                       ),
                                       TextButton(
                                         onPressed: () {
-                                          Provider.of<MedicationProvider>(context, listen: false)
+                                          Provider.of<MedicationProvider>(
+                                                  context,
+                                                  listen: false)
                                               .removeMedication(medication);
                                           Navigator.of(ctx).pop();
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(content: Text('Medication deleted')),
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                                content:
+                                                    Text('Medication deleted')),
                                           );
                                         },
-                                        child: Text('Delete', style: TextStyle(color: Colors.red)),
+                                        child: Text('Delete',
+                                            style:
+                                                TextStyle(color: Colors.red)),
                                       ),
                                     ],
                                   ),
