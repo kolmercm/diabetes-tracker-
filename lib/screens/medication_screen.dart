@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../providers/medication_provider.dart';
 import '../models/medication.dart';
+import 'package:flutter/foundation.dart';
 
 class MedicationScreen extends StatefulWidget {
   @override
@@ -10,10 +11,8 @@ class MedicationScreen extends StatefulWidget {
 }
 
 class _MedicationScreenState extends State<MedicationScreen> {
-  final TextEditingController _medicationTypeController =
-      TextEditingController();
-  final TextEditingController _medicationAmountController =
-      TextEditingController();
+  late final TextEditingController _medicationTypeController;
+  late final TextEditingController _medicationAmountController;
   final TextEditingController _dateTimeController = TextEditingController();
 
   @override
@@ -21,6 +20,10 @@ class _MedicationScreenState extends State<MedicationScreen> {
     super.initState();
     _dateTimeController.text =
         DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now());
+    _medicationTypeController =
+        TextEditingController(text: kDebugMode ? 'Aspirin' : null);
+    _medicationAmountController =
+        TextEditingController(text: kDebugMode ? '500mg' : null);
   }
 
   void _saveMedication() {
