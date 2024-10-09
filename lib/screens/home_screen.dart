@@ -7,6 +7,8 @@ import 'history_screen.dart';
 import 'profile_screen.dart';
 import 'settings_screen.dart';
 import '../services/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Add this import
+import 'login_screen.dart'; // Add this import
 
 class HomeScreen extends StatefulWidget {
   final String initialRoute;
@@ -109,15 +111,27 @@ class HomeContent extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           ElevatedButton(
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => BloodSugarScreen())),
+            onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => BloodSugarScreen())),
             child: Text('Log Blood Sugar'),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => FoodDiaryScreen())),
+            onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => FoodDiaryScreen())),
             child: Text('Food Diary'),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => MedicationScreen())),
+            onPressed: () {
+              // Add this check before navigating to MedicationScreen
+              if (FirebaseAuth.instance.currentUser != null) {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => MedicationScreen()));
+              } else {
+                // If not authenticated, navigate to LoginScreen
+                Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => LoginScreen()));
+              }
+            },
             child: Text('Medication'),
           ),
         ],

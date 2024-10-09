@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Add this import
 import '../providers/medication_provider.dart';
 import '../models/medication.dart';
 import 'package:flutter/foundation.dart';
+import '../screens/login_screen.dart'; // Add this import
 
 class MedicationScreen extends StatefulWidget {
   @override
@@ -24,6 +26,22 @@ class _MedicationScreenState extends State<MedicationScreen> {
         TextEditingController(text: kDebugMode ? 'Aspirin' : null);
     _medicationAmountController =
         TextEditingController(text: kDebugMode ? '500mg' : null);
+
+    // Add this: Check authentication status when the screen initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAuthentication();
+    });
+  }
+
+  // Add this method to check authentication
+  void _checkAuthentication() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      // If user is not authenticated, navigate to login screen
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+      );
+    }
   }
 
   void _saveMedication() async {
@@ -97,6 +115,11 @@ class _MedicationScreenState extends State<MedicationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Add this check at the beginning of the build method
+    if (FirebaseAuth.instance.currentUser == null) {
+      return Center(child: CircularProgressIndicator());
+    }
+
     final medications = Provider.of<MedicationProvider>(context).medications;
 
     return Scaffold(

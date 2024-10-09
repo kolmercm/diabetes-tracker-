@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-// import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:provider/provider.dart'; // Added import
+import 'package:firebase_auth/firebase_auth.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'providers/medication_provider.dart'; // Added import
@@ -17,8 +17,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(
-            create: (_) => MedicationProvider()), // Provided MedicationProvider
+        ChangeNotifierProvider(create: (_) => MedicationProvider()),
       ],
       child: MyApp(),
     ),
@@ -35,18 +34,26 @@ class MyApp extends StatelessWidget {
           theme: ThemeData.light(),
           darkTheme: ThemeData.dark(),
           themeMode: themeProvider.themeMode,
-          initialRoute: '/login',
-          onGenerateRoute: (settings) {
-            if (settings.name == '/login') {
-              return MaterialPageRoute(builder: (context) => LoginScreen());
-            } else {
-              final uri = Uri.parse(settings.name!);
-              final initialRoute = uri.path;
-              return MaterialPageRoute(
-                builder: (context) => HomeScreen(initialRoute: initialRoute),
-                settings: settings,
+          home: StreamBuilder<User?>(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.active) {
+                User? user = snapshot.data;
+                if (user == null) {
+                  return LoginScreen();
+                }
+                return HomeScreen();
+              }
+              return Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(),
+                ),
               );
-            }
+            },
+          ),
+          routes: {
+            '/login': (context) => LoginScreen(),
+            '/home': (context) => HomeScreen(),
           },
         );
       },
