@@ -6,32 +6,30 @@ class DatabaseService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance; // Add this line
 
-  Future<void> addBloodSugar(BloodSugar bloodSugar) async {
-    // Add this comment: Get the current user's ID
+  Future<String> addBloodSugar(BloodSugar bloodSugar) async {
     String userId = _auth.currentUser?.uid ?? '';
-    
-    await _db.collection('users').doc(userId).collection('blood_sugar').add({
-      'level': bloodSugar.level,
-      'dateTime': bloodSugar.dateTime,
-    });
+    if (userId.isEmpty) {
+      throw Exception('User not authenticated');
+    }
+
+    DocumentReference docRef =
+        await _db.collection('blood_sugar').add(bloodSugar.toFirestore());
+    return docRef.id;
   }
 
   Stream<List<BloodSugar>> getBloodSugar() {
-    // Add this comment: Get the current user's ID
     String userId = _auth.currentUser?.uid ?? '';
-    
+    if (userId.isEmpty) {
+      return Stream.value([]);
+    }
+
     return _db
-        .collection('users')
-        .doc(userId)
         .collection('blood_sugar')
+        .where('userId', isEqualTo: userId)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) {
-        return BloodSugar(
-          id: doc.id,
-          level: doc['level'],
-          dateTime: (doc['dateTime'] as Timestamp).toDate(),
-        );
+        return BloodSugar.fromFirestore(doc);
       }).toList();
     });
   }

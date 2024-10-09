@@ -14,6 +14,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
   late final TextEditingController _medicationTypeController;
   late final TextEditingController _medicationAmountController;
   final TextEditingController _dateTimeController = TextEditingController();
+  final TextEditingController _notesController = TextEditingController();
 
   @override
   void initState() {
@@ -30,10 +31,11 @@ class _MedicationScreenState extends State<MedicationScreen> {
     final String type = _medicationTypeController.text.trim();
     final String amount = _medicationAmountController.text.trim();
     final String dateTimeStr = _dateTimeController.text.trim();
+    final String notes = _notesController.text.trim();
 
     if (type.isEmpty || amount.isEmpty || dateTimeStr.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please fill in all fields')),
+        SnackBar(content: Text('Please fill in all required fields')),
       );
       return;
     }
@@ -45,6 +47,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
       type: type,
       amount: amount,
       dateTime: dateTime,
+      notes: notes,
     );
 
     Provider.of<MedicationProvider>(context, listen: false)
@@ -55,6 +58,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
     _medicationAmountController.clear();
     _dateTimeController.text =
         DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now());
+    _notesController.clear();
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Medication saved successfully')),
@@ -152,6 +156,22 @@ class _MedicationScreenState extends State<MedicationScreen> {
                 readOnly: true,
                 onTap: _selectDateTime,
               ),
+              SizedBox(height: 16),
+
+              // Notes
+              Text(
+                'Notes:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              TextField(
+                controller: _notesController,
+                decoration: InputDecoration(
+                  hintText: 'Add any additional notes here',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 5,
+              ),
               SizedBox(height: 24),
 
               // Save Button
@@ -178,8 +198,15 @@ class _MedicationScreenState extends State<MedicationScreen> {
                         return Card(
                           child: ListTile(
                             title: Text(medication.type),
-                            subtitle: Text(
-                                'Amount: ${medication.amount}\nDate/Time: ${DateFormat('yyyy-MM-dd HH:mm').format(medication.dateTime)}'),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Amount: ${medication.amount}'),
+                                Text('Date/Time: ${DateFormat('yyyy-MM-dd HH:mm').format(medication.dateTime)}'),
+                                if (medication.notes.isNotEmpty)
+                                  Text('Notes: ${medication.notes}'),
+                              ],
+                            ),
                             trailing: IconButton(
                               icon: Icon(Icons.delete, color: Colors.red),
                               onPressed: () {
@@ -235,6 +262,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
     _medicationTypeController.dispose();
     _medicationAmountController.dispose();
     _dateTimeController.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 }

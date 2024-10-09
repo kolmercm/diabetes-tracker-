@@ -1,16 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Medication {
-  String id; // New field to store Firestore document ID
+  String id;
   final String type;
   final String amount;
   final DateTime dateTime;
+  final String notes;
 
   Medication({
-    this.id = '', // Initialize with an empty string
+    this.id = '',
     required this.type,
     required this.amount,
     required this.dateTime,
+    this.notes = '',
   });
 
   // Factory constructor to create a Medication instance from Firestore document
@@ -21,6 +23,7 @@ class Medication {
       type: data['type'] ?? '',
       amount: data['amount'] ?? '',
       dateTime: DateTime.parse(data['dateTime']),
+      notes: data['notes'] ?? '',
     );
   }
 
@@ -30,6 +33,7 @@ class Medication {
       'type': type,
       'amount': amount,
       'dateTime': dateTime.toIso8601String(),
+      'notes': notes,
     };
   }
 }

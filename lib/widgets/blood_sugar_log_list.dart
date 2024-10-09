@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Add this import
+import 'package:intl/intl.dart';
 import '../services/database_service.dart';
 import '../models/blood_sugar.dart';
 
@@ -20,7 +20,7 @@ class BloodSugarLogList extends StatelessWidget {
         }
 
         List<BloodSugar> logs = snapshot.data!;
-        logs.sort((a, b) => b.dateTime.compareTo(a.dateTime)); // Sort by date, newest first
+        //  logs.sort((a, b) => b.dateTime.compareTo(a.dateTime));
 
         return ListView.builder(
           itemCount: logs.length,
