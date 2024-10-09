@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+// import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:provider/provider.dart'; // Add this import
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'firebase_options.dart';
 import 'providers/theme_provider.dart'; // Add this import
-import 'providers/medication_provider.dart'; // Add this import
+// import 'providers/medication_provider.dart'; // Add this import
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +17,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => MedicationProvider()), // Add this line
+        // ChangeNotifierProvider(create: (_) => MedicationProvider()), // Add this line
       ],
       child: MyApp(),
     ),
