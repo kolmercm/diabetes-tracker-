@@ -29,11 +29,20 @@ class _MedicationScreenState extends State<MedicationScreen> {
     final String dateTimeStr = _dateTimeController.text.trim();
 
     if (type.isEmpty || amount.isEmpty || dateTimeStr.isEmpty) {
-      // You can show a snackbar or dialog here to notify the user
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please fill in all fields')),
+      );
       return;
     }
 
-    final DateTime dateTime = DateFormat('yyyy-MM-dd HH:mm').parse(dateTimeStr);
+    final DateTime? dateTime = DateFormat('yyyy-MM-dd HH:mm').parse(dateTimeStr, true).toLocal();
+
+    if (dateTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Invalid date and time format')),
+      );
+      return;
+    }
 
     final Medication medication = Medication(
       type: type,
@@ -47,6 +56,10 @@ class _MedicationScreenState extends State<MedicationScreen> {
     _medicationTypeController.clear();
     _medicationAmountController.clear();
     _dateTimeController.text = DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now());
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Medication saved successfully')),
+    );
   }
 
   Future<void> _selectDateTime() async {
@@ -85,7 +98,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
       appBar: AppBar(title: Text('Medication')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView( // Added to prevent overflow
+        child: SingleChildScrollView( // Prevents overflow
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
