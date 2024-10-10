@@ -3,8 +3,10 @@ import 'package:table_calendar/table_calendar.dart';
 
 class HealthCalendarWidget extends StatefulWidget {
   final Function(DateTime, DateTime)? onDaySelected;
+  final Set<DateTime>? eventDays; // {{ Added eventDays parameter }}
 
-  HealthCalendarWidget({this.onDaySelected});
+  HealthCalendarWidget(
+      {this.onDaySelected, this.eventDays}); // {{ Updated constructor }}
 
   @override
   _HealthCalendarWidgetState createState() => _HealthCalendarWidgetState();
@@ -23,7 +25,14 @@ class _HealthCalendarWidgetState extends State<HealthCalendarWidget> {
       selectedDayPredicate: (day) {
         return isSameDay(_selectedDay, day);
       },
-      // Modified onDaySelected to accept only two parameters
+      // Add eventLoader to display markers
+      eventLoader: (day) {
+        return widget.eventDays != null &&
+                widget.eventDays!
+                    .contains(DateTime(day.year, day.month, day.day))
+            ? ['•'] // Using a simple dot as an event
+            : [];
+      },
       onDaySelected: (selectedDay, focusedDay) {
         if (!isSameDay(_selectedDay, selectedDay)) {
           setState(() {
@@ -43,6 +52,11 @@ class _HealthCalendarWidgetState extends State<HealthCalendarWidget> {
         ),
         selectedDecoration: BoxDecoration(
           color: Colors.orangeAccent,
+          shape: BoxShape.circle,
+        ),
+        // Customize marker decoration
+        markerDecoration: BoxDecoration(
+          color: Colors.red,
           shape: BoxShape.circle,
         ),
       ),

@@ -3,6 +3,7 @@ import '../widgets/health_calendar_widget.dart';
 import '../models/medication.dart';
 import 'package:provider/provider.dart';
 import '../providers/medication_provider.dart';
+import '../providers/food_item_provider.dart'; // Ensure FoodItemProvider is imported
 import 'package:table_calendar/table_calendar.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -16,6 +17,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final medications = Provider.of<MedicationProvider>(context).medications;
+    final foodItems = Provider.of<FoodItemProvider>(context).foodItems;
+
+    // Combine dates from medications and food items
+    Set<DateTime> eventDays = {};
+
+    for (var med in medications) {
+      eventDays.add(
+          DateTime(med.dateTime.year, med.dateTime.month, med.dateTime.day));
+    }
+
+    for (var food in foodItems) {
+      eventDays.add(
+          DateTime(food.dateTime.year, food.dateTime.month, food.dateTime.day));
+    }
 
     // Filter medications based on the selected day
     List<Medication> filteredMedications = _selectedDay == null
@@ -30,8 +45,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
       ),
       body: Column(
         children: [
-          // Health Calendar Widget with updated callback
+          // Pass eventDays to HealthCalendarWidget
           HealthCalendarWidget(
+            eventDays: eventDays, // {{ Added eventDays parameter }}
             onDaySelected: (selectedDay, focusedDay) {
               setState(() {
                 _selectedDay = selectedDay;

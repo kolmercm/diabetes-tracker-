@@ -20,7 +20,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => MedicationProvider()),
         ChangeNotifierProvider(
-            create: (_) => FoodItemProvider()), // Now this will work
+            create: (_) =>
+                FoodItemProvider()), // Ensure FoodItemProvider is included
       ],
       child: MyApp(),
     ),
