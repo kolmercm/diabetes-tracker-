@@ -4,6 +4,7 @@ import 'signup_screen.dart';
 import '../services/auth_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_svg/flutter_svg.dart'; // Added import
+import 'package:firebase_auth/firebase_auth.dart'; // Add this import
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -63,6 +64,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Redirect if already authenticated
+    if (FirebaseAuth.instance.currentUser != null) {
+      Future.microtask(() {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+      });
+      return Scaffold(); // Return empty scaffold while redirecting
+    }
+
     // Determine current theme
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 

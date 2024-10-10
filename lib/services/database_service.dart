@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Add FirebaseAuth import
 import '../models/blood_sugar.dart';
 import '../models/food_item.dart';
+import '../models/exercise.dart';
 
 class DatabaseService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -84,5 +85,62 @@ class DatabaseService {
         .collection('food_items')
         .doc(foodItem.id)
         .delete();
+  }
+
+  // Add Exercise
+  Future<void> addExercise(Exercise exercise) async {
+    String userId = _auth.currentUser?.uid ?? '';
+    if (userId.isEmpty) {
+      throw Exception('User not logged in');
+    }
+
+    await _db
+        .collection('users')
+        .doc(userId)
+        .collection('exercises')
+        .add(exercise.toMap());
+  }
+
+  // Get Exercises
+  Stream<List<Exercise>> getExercises() {
+    String userId = _auth.currentUser?.uid ?? '';
+    if (userId.isEmpty) {
+      return Stream.value([]);
+    }
+
+    return _db
+        .collection('users')
+        .doc(userId)
+        .collection('exercises')
+        .orderBy('dateTime', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) => Exercise.fromFirestore(doc)).toList();
+    });
+  }
+
+  // Remove Exercise
+  Future<void> removeExercise(Exercise exercise) async {
+    String userId = _auth.currentUser?.uid ?? '';
+    if (userId.isEmpty) {
+      throw Exception('User not logged in');
+    }
+
+    await _db
+        .collection('users')
+        .doc(userId)
+        .collection('exercises')
+        .doc(exercise.id)
+        .delete();
+  }
+
+  // Helper to get DocumentReference for an exercise
+  DocumentReference getExerciseDocRef(String exerciseId) {
+    String userId = _auth.currentUser?.uid ?? '';
+    return _db
+        .collection('users')
+        .doc(userId)
+        .collection('exercises')
+        .doc(exerciseId);
   }
 }

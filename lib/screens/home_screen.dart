@@ -5,10 +5,11 @@ import 'food_diary_screen.dart';
 import 'medication_screen.dart';
 import 'history_screen.dart';
 import 'profile_screen.dart';
+import 'exercises_screen.dart';
 import 'settings_screen.dart';
 import '../services/auth_service.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Add this import
-import 'login_screen.dart'; // Add this import
+import 'package:firebase_auth/firebase_auth.dart';
+import 'login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String initialRoute;
@@ -21,31 +22,57 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late int _selectedIndex;
+  // add profile index constant
+  final int profileIndex = 3;
+  // late List<Widget> _pages;
 
-  final List<String> _routes = ['/home', '/history', '/profile', '/settings'];
+  // List of routes corresponding to each tab
+  final List<String> _routes = [
+    '/home',
+    '/history',
+    '/exercises', // 'could be /medication'
+    '/profile',
+    '/settings',
+  ];
 
   @override
   void initState() {
     super.initState();
     _selectedIndex = _routes.indexOf(widget.initialRoute);
     if (_selectedIndex == -1) _selectedIndex = 0;
+    // _pages = [
+    //   HomeContent(onNavigate: _onItemTapped), // Home Content
+    //   HistoryScreen(),
+    //   ExercisesScreen(),
+    //   ProfileScreen(),
+    //   SettingsScreen(),
+    // ];
   }
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    if (kIsWeb) {
-      // Update URL only for web platform
-      _updateWebUrl(_routes[index]);
+    if (_selectedIndex != index) {
+      setState(() {
+        _selectedIndex = index;
+      });
+      if (kIsWeb) {
+        _updateWebUrl(
+            _routes[index]); // Ensures URL reflects the current tab on web
+      }
     }
   }
 
   void _updateWebUrl(String path) {
-    // This function updates the URL without triggering a page reload
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Navigator.pushReplacementNamed(context, path);
-    });
+    try {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Update the URL without replacing the current route
+        Navigator.of(context).pushNamed(path);
+      });
+    } catch (e) {
+      // ERROR HANDLING: Log or handle navigation errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error updating web URL: $e')),
+      );
+    }
   }
 
   @override
@@ -53,16 +80,30 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Diabetes Tracker'),
+        // NEW: Add home icon on the left side
         leading: IconButton(
-          icon: Icon(Icons.account_circle),
-          onPressed: () => _onItemTapped(2), // Profile index
+          icon: Icon(Icons.home),
+          onPressed: () => _onItemTapped(0), // Navigate to Home
         ),
         actions: [
+          // MOVED: Profile icon button
+          IconButton(
+            icon: Icon(Icons.account_circle),
+            onPressed: () => _onItemTapped(3), // Navigate to Profile
+          ),
+          // EXISTING: Logout icon button
           IconButton(
             icon: Icon(Icons.exit_to_app),
             onPressed: () async {
-              await AuthService().signOut();
-              Navigator.of(context).pushReplacementNamed('/login');
+              try {
+                await AuthService().signOut();
+                Navigator.of(context).pushReplacementNamed('/login');
+              } catch (e) {
+                // ERROR HANDLING: Show error message if sign out fails
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Error signing out: $e')),
+                );
+              }
             },
           ),
         ],
@@ -72,26 +113,31 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           HomeContent(),
           HistoryScreen(),
+          ExercisesScreen(),
           ProfileScreen(),
           SettingsScreen(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
+        type: BottomNavigationBarType.fixed, // Allows more than 3 items
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
+            icon: Icon(Icons.home), // Changed icon to home for clarity
+            label: 'Home', // Changed label to Home
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.history),
-            label: 'Your History',
+            label: 'History',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.fitness_center),
+            label: 'Exercises',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'User Profile',
+            label: 'Profile',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
@@ -104,6 +150,10 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class HomeContent extends StatelessWidget {
+  // final Function(int) onNavigate;
+
+  // HomeContent({required this.onNavigate});
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -115,11 +165,13 @@ class HomeContent extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => BloodSugarScreen())),
             child: Text('Log Blood Sugar'),
           ),
+          SizedBox(height: 16), // Added spacing between buttons
           ElevatedButton(
             onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => FoodDiaryScreen())),
             child: Text('Food Diary'),
           ),
+          SizedBox(height: 16), // Added spacing between buttons
           ElevatedButton(
             onPressed: () {
               // Add this check before navigating to MedicationScreen
@@ -127,7 +179,7 @@ class HomeContent extends StatelessWidget {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => MedicationScreen()));
               } else {
-                // If not authenticated, navigate to LoginScreen
+                // For mobile: Use pushReplacement with MaterialPageRoute
                 Navigator.of(context).pushReplacement(
                     MaterialPageRoute(builder: (context) => LoginScreen()));
               }
