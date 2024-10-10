@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-// import 'blood_sugar_screen.dart';
+import 'blood_sugar_screen.dart';
 import 'food_diary_screen.dart';
 import 'medication_screen.dart';
 import 'history_screen.dart';
@@ -11,7 +11,10 @@ import '../services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_screen.dart';
 import '../services/api_service.dart'; // Added import
-import 'package:provider/provider.dart'; // Added import
+import 'package:provider/provider.dart';
+// import '../services/database_service.dart';
+ // Added import
+//  import '../models/blood_sugar.dart'; // Added import for BloodSugar model
 
 class HomeScreen extends StatefulWidget {
   final String initialRoute;
@@ -180,12 +183,13 @@ class HomeContent extends StatelessWidget {
             ElevatedButton(
               onPressed: () async {
                 try {
-                  // Example: Log Blood Sugar
-                  int bloodSugarValue = 120; // Replace with actual value from input
-                  var response = await apiService.logBloodSugar(bloodSugarValue);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(response['message'])),
+                  // Navigate to the BloodSugarScreen
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => BloodSugarScreen()),
                   );
+                  // ScaffoldMessenger.of(context).showSnackBar(
+                  //   SnackBar(content: Text(response['message'])),
+                  // );
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Error: $e')),
@@ -206,11 +210,14 @@ class HomeContent extends StatelessWidget {
                 // Add this check before navigating to MedicationScreen
                 if (FirebaseAuth.instance.currentUser != null) {
                   try {
-                    // Example: Send medication-related data if needed
-                    var response = await apiService.logBloodSugar(0); // Replace with actual method
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(response['message'])),
-                    );
+                    // Navigate to MedicationScreen
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => MedicationScreen(),
+                    ));
+                    // Note: Removed API call as it's not needed for navigation
+                    // ScaffoldMessenger.of(context).showSnackBar(
+                    //   SnackBar(content: Text(response['message'])),
+                    // );
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => MedicationScreen()));
                   } catch (e) {

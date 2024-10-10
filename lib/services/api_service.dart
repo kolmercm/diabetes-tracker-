@@ -20,32 +20,32 @@ class ApiService {
   bool get isAuthTokenSet => _authToken != null && _authToken!.isNotEmpty;
 
   // Example: POST request to log blood sugar
-  Future<Map<String, dynamic>> logBloodSugar(int bloodSugar) async {
-    final url = Uri.parse('$baseUrl/process-data');
-    try {
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          if (_authToken != null)
-            'Authorization':
-                'Bearer $_authToken', // Modified: Added Authorization header
-        },
-        body: jsonEncode({
-          'blood_sugar': bloodSugar,
-          'timestamp': DateTime.now().toIso8601String()
-        }),
-      );
+  // Future<Map<String, dynamic>> logBloodSugar(int bloodSugar) async {
+  //   final url = Uri.parse('$baseUrl/process-data');
+  //   try {
+  //     final response = await http.post(
+  //       url,
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         if (_authToken != null)
+  //           'Authorization':
+  //               'Bearer $_authToken', // Modified: Added Authorization header
+  //       },
+  //       body: jsonEncode({
+  //         'blood_sugar': bloodSugar,
+  //         'timestamp': DateTime.now().toIso8601String()
+  //       }),
+  //     );
 
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        throw Exception('Failed to log blood sugar');
-      }
-    } catch (e) {
-      throw Exception('Error: $e');
-    }
-  }
+  //     if (response.statusCode == 200) {
+  //       return jsonDecode(response.body);
+  //     } else {
+  //       throw Exception('Failed to log blood sugar');
+  //     }
+  //   } catch (e) {
+  //     throw Exception('Error: $e');
+  //   }
+  // }
 
   // Example: GET request to retrieve app info
   Future<Map<String, dynamic>> getAppInfo() async {
