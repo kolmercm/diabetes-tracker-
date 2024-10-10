@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'blood_sugar_screen.dart';
+// import 'blood_sugar_screen.dart';
 import 'food_diary_screen.dart';
 import 'medication_screen.dart';
 import 'history_screen.dart';
@@ -10,6 +10,8 @@ import 'settings_screen.dart';
 import '../services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_screen.dart';
+import '../services/api_service.dart'; // Added import
+import 'package:provider/provider.dart'; // Added import
 
 class HomeScreen extends StatefulWidget {
   final String initialRoute;
@@ -22,9 +24,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late int _selectedIndex;
-  // add profile index constant
+  // Added profile index constant
   final int profileIndex = 3;
-  // late List<Widget> _pages;
 
   // List of routes corresponding to each tab
   final List<String> _routes = [
@@ -35,18 +36,31 @@ class _HomeScreenState extends State<HomeScreen> {
     '/settings',
   ];
 
+  late ApiService apiService; // Added
+
   @override
   void initState() {
     super.initState();
     _selectedIndex = _routes.indexOf(widget.initialRoute);
     if (_selectedIndex == -1) _selectedIndex = 0;
-    // _pages = [
-    //   HomeContent(onNavigate: _onItemTapped), // Home Content
-    //   HistoryScreen(),
-    //   ExercisesScreen(),
-    //   ProfileScreen(),
-    //   SettingsScreen(),
-    // ];
+
+    // Initialize ApiService and set the auth token
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      apiService = Provider.of<ApiService>(context, listen: false);
+      final authService = AuthService();
+      String? token = await authService.getIdToken();
+      if (token != null) {
+        apiService.setAuthToken(token);
+      } else {
+        // Handle case where token is not available
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to retrieve auth token. Please log in again.')),
+        );
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+        );
+      }
+    });
   }
 
   void _onItemTapped(int index) {
@@ -55,8 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _selectedIndex = index;
       });
       if (kIsWeb) {
-        _updateWebUrl(
-            _routes[index]); // Ensures URL reflects the current tab on web
+        _updateWebUrl(_routes[index]); // Ensures URL reflects the current tab on web
       }
     }
   }
@@ -77,6 +90,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Ensure ApiService is available
+    apiService = Provider.of<ApiService>(context, listen: false);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Diabetes Tracker'),
@@ -89,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // MOVED: Profile icon button
           IconButton(
             icon: Icon(Icons.account_circle),
-            onPressed: () => _onItemTapped(3), // Navigate to Profile
+            onPressed: () => _onItemTapped(profileIndex), // Navigate to Profile
           ),
           // EXISTING: Logout icon button
           IconButton(
@@ -111,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: IndexedStack(
         index: _selectedIndex,
         children: [
-          HomeContent(),
+          HomeContent(apiService: apiService), // Passed ApiService
           HistoryScreen(),
           ExercisesScreen(),
           ProfileScreen(),
@@ -150,43 +166,84 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class HomeContent extends StatelessWidget {
-  // final Function(int) onNavigate;
+  final ApiService apiService; // Added
 
-  // HomeContent({required this.onNavigate});
+  HomeContent({required this.apiService}); // Modified
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => BloodSugarScreen())),
-            child: Text('Log Blood Sugar'),
-          ),
-          SizedBox(height: 16), // Added spacing between buttons
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => FoodDiaryScreen())),
-            child: Text('Food Diary'),
-          ),
-          SizedBox(height: 16), // Added spacing between buttons
-          ElevatedButton(
-            onPressed: () {
-              // Add this check before navigating to MedicationScreen
-              if (FirebaseAuth.instance.currentUser != null) {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => MedicationScreen()));
-              } else {
-                // For mobile: Use pushReplacement with MaterialPageRoute
-                Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => LoginScreen()));
-              }
-            },
-            child: Text('Medication'),
-          ),
-        ],
+      child: SingleChildScrollView( // Prevent overflow on smaller screens
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  // Example: Log Blood Sugar
+                  int bloodSugarValue = 120; // Replace with actual value from input
+                  var response = await apiService.logBloodSugar(bloodSugarValue);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(response['message'])),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error: $e')),
+                  );
+                }
+              },
+              child: Text('Log Blood Sugar'),
+            ),
+            SizedBox(height: 16), // Added spacing between buttons
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => FoodDiaryScreen())),
+              child: Text('Food Diary'),
+            ),
+            SizedBox(height: 16), // Added spacing between buttons
+            ElevatedButton(
+              onPressed: () async {
+                // Add this check before navigating to MedicationScreen
+                if (FirebaseAuth.instance.currentUser != null) {
+                  try {
+                    // Example: Send medication-related data if needed
+                    var response = await apiService.logBloodSugar(0); // Replace with actual method
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(response['message'])),
+                    );
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => MedicationScreen()));
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error: $e')),
+                    );
+                  }
+                } else {
+                  // For mobile: Use pushReplacement with MaterialPageRoute
+                  Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (context) => LoginScreen()));
+                }
+              },
+              child: Text('Medication'),
+            ),
+            SizedBox(height: 16), // Added spacing between buttons
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  var info = await apiService.getAppInfo();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('App: ${info['app']}, Version: ${info['version']}')),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error: $e')),
+                  );
+                }
+              },
+              child: Text('Get App Info'),
+            ),
+          ],
+        ),
       ),
     );
   }

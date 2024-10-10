@@ -13,6 +13,9 @@ class AuthService {
     ],
   );
 
+  Stream<User?> get authStateChanges => _auth.authStateChanges();
+  
+
   Future<User?> signIn(String email, String password) async {
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
@@ -69,5 +72,13 @@ class AuthService {
       // print(e);
       return null;
     }
+  }
+
+  Future<String?> getIdToken() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      return await user.getIdToken();
+    }
+    return null;
   }
 }

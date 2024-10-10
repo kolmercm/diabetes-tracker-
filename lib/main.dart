@@ -9,12 +9,8 @@ import 'firebase_options.dart';
 import 'providers/theme_provider.dart'; // Ensure this is included
 import 'providers/food_item_provider.dart'; // Add this import
 import 'providers/exercise_provider.dart'; // Add this import
-// import 'screens/signup_screen.dart'; // Added import
-// import 'screens/history_screen.dart'; // Added import
-// import 'screens/exercises_screen.dart'; // Add this import
-// import 'screens/settings_screen.dart'; // Add this import
-// import 'screens/profile_screen.dart'; // Add this import
-// import 'screens/blood_sugar_screen.dart'; // Add this import
+import 'services/api_service.dart'; // Added import
+import 'providers/auth_provider.dart' as app_auth; // Changed import
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,10 +24,31 @@ void main() async {
         ChangeNotifierProvider(create: (_) => MedicationProvider()),
         ChangeNotifierProvider(create: (_) => FoodItemProvider()),
         ChangeNotifierProvider(create: (_) => ExerciseProvider()),
+        Provider<ApiService>(
+          create: (_) => ApiService(baseUrl: getBaseUrl()),
+          lazy: false,
+        ),
+        ChangeNotifierProvider(
+          create: (context) => app_auth.AuthProvider( // Changed to use app_auth prefix
+            Provider.of<ApiService>(context, listen: false),
+          ),
+        ),
       ],
       child: MyApp(),
     ),
   );
+}
+
+// Function to determine the base URL based on the platform
+String getBaseUrl() {
+  // For Web
+  if (Uri.base.scheme == 'http') {
+    return 'http://127.0.0.1:8000';
+  } else {
+    // For Android Emulator
+    return 'http://10.0.2.2:8000';
+    // For iOS Simulator, you can use 'http://127.0.0.1:8000' or your machine's IP address
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -45,43 +62,21 @@ class MyApp extends StatelessWidget {
           darkTheme: ThemeData.dark(),
           themeMode: themeProvider.themeMode,
           debugShowCheckedModeBanner: false, // Optional: Remove debug banner
-          // NEW: Define routes for better navigation handling
+          // Define routes for better navigation handling
           routes: {
             '/login': (context) => LoginScreen(),
-            // '/signup': (context) => SignUpScreen(),
             '/home': (context) => HomeScreen(),
-            // '/blood_sugar': (context) => BloodSugarScreen(),
-            // '/history': (context) => HistoryScreen(),
-            // '/exercises': (context) => ExercisesScreen(),
-            // '/profile': (context) => ProfileScreen(),
-            // '/settings': (context) => SettingsScreen(),
+            // Additional routes can be managed within their respective screens or added here
           },
-          // onGenerateRoute: (settings) {
-          //   // ERROR HANDLING: Handle undefined routes
-          //   if (settings.name == null) {
-          //     return MaterialPageRoute(builder: (context) => LoginScreen());
-          //   }
-          //   switch (settings.name) {
-          //     case '/login':
-          //       return MaterialPageRoute(builder: (context) => LoginScreen());
-          //     case '/signup':
-          //       return MaterialPageRoute(builder: (context) => SignUpScreen());
-          //     case '/home':
-          //       return MaterialPageRoute(builder: (context) => HomeNavigator());
-          //     // Add cases for other routes if necessary
-          //     default:
-          //       return MaterialPageRoute(builder: (context) => LoginScreen());
-          //   }
-          // },
           home: StreamBuilder<User?>(
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.active) {
                 User? user = snapshot.data;
                 if (user == null) {
-                  return LoginScreen(); // Show unauthenticated navigator
+                  return LoginScreen(); // Show unauthenticated screen
                 }
-                return HomeScreen(); // Show authenticated navigator
+                return HomeScreen(); // Show authenticated screen
               }
               // Loading state
               return Scaffold(

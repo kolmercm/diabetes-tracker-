@@ -3,8 +3,10 @@ import 'home_screen.dart';
 import 'signup_screen.dart';
 import '../services/auth_service.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_svg/flutter_svg.dart'; // Added import
-import 'package:firebase_auth/firebase_auth.dart'; // Add this import
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart'; // Added import for Provider
+import '../services/api_service.dart'; // Added import for ApiService
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -29,6 +31,12 @@ class _LoginScreenState extends State<LoginScreen> {
     final user = await _authService.signIn(
         emailController.text, passwordController.text);
     if (user != null) {
+      // Fetch the ID token
+      String? token = await _authService.getIdToken();
+      if (token != null) {
+        // Set the auth token in ApiService
+        Provider.of<ApiService>(context, listen: false).setAuthToken(token);
+      }
       Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => HomeScreen()));
     } else {
@@ -45,6 +53,12 @@ class _LoginScreenState extends State<LoginScreen> {
   void _loginWithGoogle() async {
     final user = await _authService.signInWithGoogle();
     if (user != null) {
+      // Fetch the ID token
+      String? token = await _authService.getIdToken();
+      if (token != null) {
+        // Set the auth token in ApiService
+        Provider.of<ApiService>(context, listen: false).setAuthToken(token);
+      }
       Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => HomeScreen()));
     } else {
