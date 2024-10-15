@@ -1,15 +1,8 @@
 {
-    "version": 2,
-    "builds": [
+    "rewrites": [
         {
-            "src": "build/web/**/*",
-            "use": "@vercel/static"
-        }
-    ],
-    "routes": [
-        {
-            "src": "/diabetes(/.*)?",
-            "dest": "/index.html"
+            "source": "/diabetes/:path*",
+            "destination": "/index.html"
         }
     ]
 }
