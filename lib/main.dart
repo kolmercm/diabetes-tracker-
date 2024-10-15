@@ -64,10 +64,10 @@ class MyApp extends StatelessWidget {
           themeMode: themeProvider.themeMode,
           debugShowCheckedModeBanner: false, // Optional: Remove debug banner
           // Define routes for better navigation handling
-          initialRoute: '/diabetes/',
+          
           routes: {
-            '/diabetes/login': (context) => LoginScreen(),
-            '/diabetes/home': (context) => HomeScreen(),
+            '/login': (context) => LoginScreen(),
+            '/home': (context) => HomeScreen(),
             // Additional routes can be managed within their respective screens or added here
           },
           home: StreamBuilder<User?>(
