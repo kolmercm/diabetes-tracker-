@@ -8,8 +8,8 @@
     ],
     "routes": [
         {
-            "src": "/dibetes/(.*)",
-            "dest": "/$1"
+            "src": "/diabetes/(/.*)?",
+            "dest": "/index.html"
         }
     ]
 }
