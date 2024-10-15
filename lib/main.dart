@@ -29,7 +29,8 @@ void main() async {
           lazy: false,
         ),
         ChangeNotifierProvider(
-          create: (context) => app_auth.AuthProvider( // Changed to use app_auth prefix
+          create: (context) => app_auth.AuthProvider(
+            // Changed to use app_auth prefix
             Provider.of<ApiService>(context, listen: false),
           ),
         ),
@@ -63,9 +64,10 @@ class MyApp extends StatelessWidget {
           themeMode: themeProvider.themeMode,
           debugShowCheckedModeBanner: false, // Optional: Remove debug banner
           // Define routes for better navigation handling
+          initialRoute: '/diabetes/',
           routes: {
-            '/login': (context) => LoginScreen(),
-            '/home': (context) => HomeScreen(),
+            '/diabetes/login': (context) => LoginScreen(),
+            '/diabetes/home': (context) => HomeScreen(),
             // Additional routes can be managed within their respective screens or added here
           },
           home: StreamBuilder<User?>(
